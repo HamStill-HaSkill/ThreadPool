@@ -5,49 +5,36 @@
 #include <functional>
 #include <condition_variable>
 #include <dos.h>
+#include "ThreadPool.cpp"
+#include <windows.h>
 
 
-std::list<std::function<void()>> tasks;
-std::condition_variable cv;
-std::mutex cv_m;
-
-int i = 0;
-
-void task()
+void Test1()
 {
-    std::cerr << "Task \n";
+    Sleep(2000);
+    std::cerr << "hello home\n";
+}
+void Test2()
+{
+    Sleep(1000);
+    std::cerr << "hello world\n";
 }
 
-void foo()
-{
-    std::unique_lock<std::mutex> lk(cv_m);
-    if (tasks.empty())
-    {
-        cv.wait(lk);
-    }
-    else
-    {
-        tasks.front()();
-    }
-
-}
 
 int main()
-{
-    std::vector<std::thread> ths;
-    std::size_t n;
+{   
+    int n;
     std::cin >> n;
 
+    ThreadPool threadPool(n);
 
-    for (std::size_t i = 0; i < n; ++i)
-        ths.push_back(std::thread(foo));
-
-    tasks.push_back(task);
-
-    cv.notify_all();
-
-    for (auto& th : ths)
-        th.join();
+    threadPool.AddTask(Test1);
+    threadPool.AddTask(Test2);
+    //Sleep(4000);
+    threadPool.AddTask(Test2);
+    threadPool.AddTask(Test1);
+   
+    threadPool.StopThreads();
 
     return 0;
 }
