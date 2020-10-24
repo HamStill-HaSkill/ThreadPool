@@ -6,21 +6,33 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <wtypes.h>
+#include "ThreadPool.h"
 
-class ThreadPool
-{
-private:
-    std::vector<std::thread> ths;
-    std::list<std::function<void()>> tasks;
-    std::mutex mutex;
-    bool exit = false;
+#define MAX_THREADS 255
+#define BUF_SIZE 255
+
+    std::list<std::function<void()>> ThreadPool::tasks;
+    std::mutex ThreadPool::mutex;
+    bool ThreadPool::exitFlag = false;
     int maxThreads;
-    int currentNumOfThreads = 0;
+    int ThreadPool::currentNumOfThreads = 0;
+    HANDLE hThreadArray[MAX_THREADS];
 
-    void Task()
+    void ThreadPool::WriteLog(std::string mess)
+    {
+        std::ofstream out("Log.txt", std::ios::app);
+        if (out.is_open())
+        {
+            out << mess << std::endl;
+        }
+        out.close();
+    }
+
+    unsigned int ThreadPool::Task(void* args)
     {
         std::function<void()> task;
-        while (!exit)
+        while (!exitFlag)
         {        
             if (!tasks.empty())
             {
@@ -47,38 +59,33 @@ private:
                 }              
                 currentNumOfThreads--;
             } 
-        }       
-    }
-
-    void WriteLog(std::string mess)
-    {
-        std::ofstream out("Log.txt", std::ios::app);
-        if (out.is_open())
-        {
-            out << mess << std::endl;
         }
-        out.close();
+        return 0;
     }
-
-public:    
-    ThreadPool(int n)
+   
+    ThreadPool::ThreadPool(int n)
     {
+        unsigned int   dwThreadIdArray[MAX_THREADS];
         maxThreads = n;
-        for (int i = 0; i < n; ++i)
+
+        for (int i = 0; i < maxThreads; i++)
         {
-            ths.push_back(std::thread(&ThreadPool::Task, this));
-            std::cerr << "Thread " << ths[i].get_id() << " was create\n";
+
+            hThreadArray[i] = (HANDLE)_beginthreadex(NULL, 0, ThreadPool::Task, this, 0, &dwThreadIdArray[i]);
+
+            std::cerr << "Thread " << hThreadArray[i] << " was create\n";
 
             std::ofstream out("Log.txt", std::ios::app);
             if (out.is_open())
             {
-                out << "Thread " << ths[i].get_id() << " was create" << std::endl;
+                out << "Thread " << hThreadArray[i] << " was create" << std::endl;
             }
             out.close();
-        }
+
+        } 
             
     }
-    void AddTask(std::function<void()> task)
+    void ThreadPool::AddTask(std::function<void()> task)
     {
         if (currentNumOfThreads < maxThreads)
         {
@@ -94,10 +101,15 @@ public:
         }
     }
 
-    void StopThreads()
+    void ThreadPool::StopThreads()
     {
-        exit = true;
-        for (auto& th : ths)
-            th.join();       
+        exitFlag = true;
+        WaitForMultipleObjects(maxThreads, hThreadArray, TRUE, INFINITE);
+
+        for (int i = 0; i < maxThreads; i++)
+        {
+            CloseHandle(hThreadArray[i]);
+        }  
     }
-};
+
+

@@ -5,9 +5,8 @@
 #include <functional>
 #include <condition_variable>
 #include <dos.h>
-#include "ThreadPool.cpp"
+#include "ThreadPool.h"
 #include <windows.h>
-
 
 void Test1()
 {
@@ -22,7 +21,7 @@ void Test2()
 
 
 int main()
-{   
+{
     int n;
     std::cin >> n;
 
@@ -33,8 +32,8 @@ int main()
     //Sleep(4000);
     threadPool.AddTask(Test2);
     threadPool.AddTask(Test1);
-   
+
     threadPool.StopThreads();
 
-    return 0;
+    exit(0);
 }
