@@ -29,7 +29,7 @@
         out.close();
     }
 
-    unsigned int ThreadPool::Task(void* args)
+    DWORD WINAPI ThreadPool::Task(void* args)
     {
         std::function<void()> task;
         while (!exitFlag)
@@ -65,20 +65,20 @@
    
     ThreadPool::ThreadPool(int n)
     {
-        unsigned int   dwThreadIdArray[MAX_THREADS];
+        DWORD dwThreadIdArray[MAX_THREADS];
         maxThreads = n;
 
         for (int i = 0; i < maxThreads; i++)
         {
 
-            hThreadArray[i] = (HANDLE)_beginthreadex(NULL, 0, ThreadPool::Task, this, 0, &dwThreadIdArray[i]);
+            hThreadArray[i] = CreateThread(NULL, 0, ThreadPool::Task, 0, 0, &dwThreadIdArray[i]);  
 
-            std::cerr << "Thread " << hThreadArray[i] << " was create\n";
+            std::cerr << "Thread " << dwThreadIdArray[i] << " was create\n";
 
             std::ofstream out("Log.txt", std::ios::app);
             if (out.is_open())
             {
-                out << "Thread " << hThreadArray[i] << " was create" << std::endl;
+                out << "Thread " << dwThreadIdArray[i] << " was create" << std::endl;
             }
             out.close();
 

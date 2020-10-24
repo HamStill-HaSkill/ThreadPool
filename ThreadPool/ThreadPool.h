@@ -21,7 +21,7 @@ public:
     int maxThreads;
     static int currentNumOfThreads;
     HANDLE  hThreadArray[];
-    static unsigned int _stdcall Task(void* args);
+    static DWORD WINAPI _stdcall Task(void* args);
     ThreadPool(int n);
     void AddTask(std::function<void()> task);
     void StopThreads();

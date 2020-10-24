@@ -1,0 +1,31 @@
+Thread 11248 was create
+Thread 19052 was create
+Thread 11516 was create
+Thread 5084 was create
+Add new task
+Add new task
+Add new task
+Add new task
+Thread 16508 was create
+Thread 18676 was create
+Add new task
+Add new task
+Exceeding the maximum allowed number of running threads
+Exceeding the maximum allowed number of running threads
+Thread 5096 was create
+Thread 20220 was create
+Thread 6652 was create
+Add new task
+Add new task
+Add new task
+Exceeding the maximum allowed number of running threads
+Thread 3176 was create
+Thread 15616 was create
+Thread 16452 was create
+Thread 12044 was create
+Thread 3220 was create
+Thread 10064 was create
+Add new task
+Add new task
+Add new task
+Add new task
